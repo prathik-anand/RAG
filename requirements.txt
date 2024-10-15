@@ -1,0 +1,13 @@
+flask
+flask-cors
+langchain
+langchain-community
+langchain-openai
+langchain-groq
+openai
+chromadb
+python-dotenv
+pypdf
+python-docx
+docx2txt
+langchain_chroma
