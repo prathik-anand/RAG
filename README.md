@@ -44,7 +44,8 @@ This implementation achieves a balance between performance, efficiency, and scal
    cd your-repo-name
    ```
 
-2. Create a virtual environment and activate it:
+2. Create a virtual environment and activate it
+
    Windows:
    ```
    python -m venv .venv
