@@ -40,7 +40,7 @@ This implementation achieves a balance between performance, efficiency, and scal
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/your-repo-name.git
+   git clone https://github.com/prathik-anand/RAG
    cd your-repo-name
    ```
 
@@ -102,3 +102,9 @@ This implementation achieves a balance between performance, efficiency, and scal
 - `data/`: Directory for storing documents to be processed
 - `vector_store/`: Directory where the Chroma vector store is persisted
 
+##UI REPOSITORY(optional):
+
+This could help you build user interface for your RAG application
+```
+git clone https://github.com/prathik-anand/rag-ui
+```
