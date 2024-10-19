@@ -14,7 +14,7 @@ class RAGService:
         )
         self.vector_store = VectorStoreManager().get_vector_store()
 
-    def get_answer(self, question):
+    def query(self, question):
         relevant_docs = self.vector_store.similarity_search(question, k=VECTOR_STORE_SIMILARITY_K)
         context = "\n".join([doc.page_content for doc in relevant_docs])
         prompt = PromptTemplate(template=RAG_PROMPT_TEMPLATE, input_variables=["context", "question"])
