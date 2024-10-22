@@ -11,7 +11,7 @@ query_bp = Blueprint('query', __name__)
 rag_service = RAGService()
 
 @query_bp.route('/query', methods=['POST'])
-def query():
+async def query():
     """This endpoint is used to query the Chroma DB"""
     try:
         query_input = request.json.get('query')
@@ -25,13 +25,15 @@ def query():
         # location = ip_metadata.json()['city']
         location = None
         
-        title, response = rag_service.get_answer(user_id, query_input, ip_address, location, chat_id)
+        title, response = await rag_service.get_answer(user_id, query_input, ip_address, location, chat_id)
+        
         logger.info(f"Query processed successfully for user_id: {user_id}, chat_id: {chat_id}")
+        
         return jsonify({"title": title, "response": response}), 200
 
     except ValueError as ve:
         logger.warning(f"ValueError: {str(ve)}")
-        return jsonify({"error": str(ve)}), 400
+        return jsonify({"error": str(ve)}), 400  # Bad Request
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}", exc_info=True)
         return jsonify({"error": "An unexpected error occurred: " + str(e)}), 500  # Internal Server Error
