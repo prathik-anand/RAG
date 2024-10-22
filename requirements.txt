@@ -11,3 +11,6 @@ pypdf
 python-docx
 docx2txt
 langchain_chroma
+SQLAlchemy
+psycopg2-binary
+geocoder

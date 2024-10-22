@@ -1,1 +1,2 @@
 from .vector_store_repository import VectorStoreRepository
+from .chat_repository import ChatRepository
