@@ -1,87 +1,93 @@
 # RAG (Retrieval-Augmented Generation) Application
 
-This is a Flask-based RAG application that uses Chroma DB for vector storage and Groq for language model processing.
+This is a Flask-based RAG application that utilizes Chroma DB for vector storage and Groq for language model processing, designed to efficiently manage and query document embeddings from various sources.
+
+## Overview
+
+The RAG application not only processes local files but also integrates with cloud-based document repositories such as **Google Drive** and **Confluence**. This allows users to seamlessly read files and create indexes for them, enhancing the application's versatility and usability.
 
 ## Features
 
-- Processes and indexes PDF, DOCX, and TXT files
-- Uses OpenAI embeddings for document vectorization
-- Implements a RAG pipeline for answering questions based on the indexed documents
-- Provides a simple API endpoint for querying the system
+- **Document Processing**: Supports indexing of PDF, DOCX, and TXT files from local storage.
+- **Cloud Integration**: 
+  - **Google Drive**: Authenticate using a JSON credentials file to access documents stored in Google Drive, enabling users to index and query their cloud-based files.
+  - **Confluence**: Connect to Confluence to read and index documentation, making it easy to retrieve information from collaborative platforms.
+- **OpenAI Embeddings**: Utilizes OpenAI embeddings for effective document vectorization.
+- **RAG Pipeline**: Implements a Retrieval-Augmented Generation pipeline for answering questions based on indexed documents.
+- **API Endpoint**: Provides a simple API endpoint for querying the system.
+- **Chat History Tracking**: Tracks chat histories and metadata in a PostgreSQL database, allowing for efficient retrieval and analysis of past interactions.
 
 ## Efficient Use of Chroma DB
 
-Our application leverages Chroma DB as a vector store for efficient management and querying of document embeddings. Here's how we optimize its usage:
+Our application leverages Chroma DB as a vector store for efficient management and querying of document embeddings. Key optimizations include:
 
-1. **Smart Initialization**: The application checks for an existing vector store before creating a new one, avoiding unnecessary reprocessing of documents.
+1. **Smart Initialization**: Checks for an existing vector store to avoid unnecessary reprocessing of documents.
+2. **Persistence**: Stores the vector database in a dedicated directory, maintaining the knowledge base across multiple application runs.
+3. **Load or Create**: Attempts to load an existing vector store on startup; creates a new one only if none exists.
+4. **Efficient Document Processing**: Processes documents once, splits them into chunks, and embeds them for precise similarity searches.
+5. **One-Time Embedding Creation**: Creates document embeddings only once, significantly reducing startup time for subsequent runs.
+6. **Optimized Similarity Search**: Utilizes Chroma DB's built-in similarity search functionality for efficient querying.
+7. **Scalability**: Scales well with increasing document numbers, allowing new documents to be added without reprocessing existing ones.
+8. **Memory Efficiency**: Handles larger document collections than what might fit in memory through persistent storage.
+9. **Consistency**: Ensures consistent search results across application restarts due to vector store persistence.
+10. **Flexibility for Updates**: The structure allows for future enhancements, such as incremental updates to the vector store.
 
-2. **Persistence**: We use Chroma's persistence capabilities, storing the vector database in a dedicated directory. This allows the knowledge base to be maintained across multiple runs of the application.
-
-3. **Load if Exists, Create if Not**: On startup, the application first attempts to load an existing vector store. If none exists, only then does it create a new one by processing the documents.
-
-4. **Efficient Document Processing**: When creating a new vector store, documents are processed once, split into chunks, and embedded. This chunking strategy allows for more precise similarity searches.
-
-5. **One-Time Embedding Creation**: Document embeddings are created only once and then persisted, significantly reducing startup time for subsequent runs.
-
-6. **Optimized Similarity Search**: We leverage Chroma DB's built-in similarity search functionality for efficient querying of relevant document chunks.
-
-7. **Scalability**: This approach scales well with increasing numbers of documents, as new documents can be added to the existing vector store without reprocessing previously embedded documents.
-
-8. **Memory Efficiency**: By using persistent storage, the application can handle larger document collections than what might fit in memory.
-
-9. **Consistency**: The persistence of the vector store ensures consistency in search results across application restarts.
-
-10. **Flexibility for Updates**: While the current implementation focuses on initial creation and subsequent loading, the structure allows for future enhancements such as incremental updates to the vector store.
-
-This implementation achieves a balance between performance, efficiency, and scalability, providing fast query responses and maintaining a persistent, updateable knowledge base for enhanced question-answering capabilities.
-
+This implementation balances performance, efficiency, and scalability, providing fast query responses and maintaining a persistent, updateable knowledge base for enhanced question-answering capabilities.
 
 ## Installation
 
-1. Clone the repository:
-   ```
+1. **Clone the repository**:
+   ```bash
    git clone https://github.com/prathik-anand/RAG
-   cd your-repo-name
+   cd RAG
    ```
 
-2. Create a virtual environment and activate it
+2. **Create and activate a virtual environment**:
 
-   Windows:
-   ```
+   **Windows**:
+   ```bash
    python -m venv .venv
    .venv\Scripts\activate
    ```
-   Linux or MacOS:
-   ```
+
+   **Linux or MacOS**:
+   ```bash
    python3 -m venv .venv
-   source venv/bin/activate
+   source .venv/bin/activate
    ```
 
-3. Install the required packages:
-   ```
+3. **Install the required packages**:
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. Set up your environment variables by creating a `.env` file in the root directory with the following content:
-   ```
+4. **Set up your environment variables** by creating a `.env` file in the root directory with the following content:
+   ```plaintext
    GROQ_API_KEY=your_groq_api_key
    OPENAI_API_KEY=your_openai_api_key
+   GOOGLE_DRIVE_CREDENTIALS=path/to/your/credentials.json  # Path to your Google Drive JSON credentials file
+   CONFLUENCE_API_KEY=your_confluence_api_key
    DOCUMENTS_DIRECTORY=data
    VECTOR_STORE_PATH=vector_store
+   DB_HOST=yourhost # e.g. localhost
+   DB_PORT=your_postgres_port # e.g. 5432
+   DB_NAME=dbname # e.g. RAG_CHAT
+   DB_USER=dbusername # e.g. postgres
+   DB_PASSWORD=dbpassword # e.g. xyzabc
    ```
 
 ## Usage
 
-1. Place your documents (PDF, DOCX, TXT) in the `data` directory.
+1. **Place your documents** (PDF, DOCX, TXT) in the `data` directory or connect to your Google Drive and Confluence accounts.
 
-2. Run the application:
-   ```
+2. **Run the application**:
+   ```bash
    python main.py
    ```
 
 3. The application will start and create/load the vector store as necessary.
 
-4. To query the system, send a POST request to `http://localhost:5000/api/query` with a JSON body:
+4. **To query the system**, send a POST request to `http://localhost:5000/api/query` with a JSON body:
    ```json
    {
      "question": "Your question here"
@@ -90,21 +96,25 @@ This implementation achieves a balance between performance, efficiency, and scal
 
 ## Project Structure
 
-- `main.py`: Entry point of the application
-- `src/`: Contains the main application code
-  - `app.py`: Flask application setup
-  - `api/`: API endpoints
-  - `services/`: Business logic
-  - `repositories/`: Data access layer
-  - `utils/`: Utility functions
-  - `config.py`: Configuration management
-  - `constants.py`: Constant values used across the application
-- `data/`: Directory for storing documents to be processed
-- `vector_store/`: Directory where the Chroma vector store is persisted
+- `main.py`: Entry point of the application.
+- `src/`: Contains the main application code.
+  - `app.py`: Flask application setup.
+  - `api/`: API endpoints.
+  - `services/`: Business logic.
+  - `repositories/`: Data access layer.
+  - `utils/`: Utility functions.
+  - `config.py`: Configuration management.
+  - `constants.py`: Constant values used across the application.
+- `data/`: Directory for storing documents to be processed.
+- `vector_store/`: Directory where the Chroma vector store is persisted.
 
-##UI REPOSITORY(optional):
+## UI Repository (Optional)
 
-This could help you build user interface for your RAG application
-```
+This repository can help you build a user interface for your RAG application:
+```bash
 git clone https://github.com/prathik-anand/rag-ui
 ```
+
+## Conclusion
+
+This RAG application provides a powerful framework for efficiently managing and querying document embeddings from both local and cloud-based sources, enhancing the user experience through fast and accurate information retrieval. Additionally, it tracks chat histories and metadata in a PostgreSQL database, allowing for comprehensive analysis of user interactions.
