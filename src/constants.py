@@ -13,3 +13,6 @@ Context:
 
 Question: {question}
 Answer:"""
+
+# Logging Configuration
+LOGGING_LEVEL = "ERROR"

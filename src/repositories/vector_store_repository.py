@@ -44,7 +44,7 @@ class VectorStoreRepository:
         
         if self.is_vector_store_exists():
             Logger.log_info("Deleting existing vector store...")
-            self.delete_indexes()
+            #self.delete_indexes()
         
         Logger.log_info("Creating new vector store...")
         return Chroma.from_documents(texts, self.embeddings, persist_directory=self.persist_directory)
@@ -52,7 +52,15 @@ class VectorStoreRepository:
     def add_to_indexes(self, texts):
         """This method is used to add document for existing indexes"""
         Logger.log_info("Creating partial indexes...")
-        Chroma.add_documents(texts, self.embeddings, persist_directory=self.persist_directory)
+        if not texts:
+            Logger.log_error("Texts must be provided to add to indexes.")
+            raise ValueError("Texts must be provided to add to indexes.")
+        
+        if self.is_vector_store_exists():   
+            #Chroma.add_documents(texts, self.embeddings, persist_directory=self.persist_directory)
+            pass
+        else:
+            self.create_full_indexes(texts)
         
     def delete_indexes(self):
         """This is used to delete the existing vectorstore"""
