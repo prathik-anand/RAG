@@ -11,7 +11,7 @@ query_bp = Blueprint('query', __name__)
 rag_service = RAGService()
 
 @query_bp.route('/query', methods=['POST'])
-async def query():
+def query():
     """This endpoint is used to query the Chroma DB"""
     try:
         query_input = request.json.get('query')
@@ -25,7 +25,7 @@ async def query():
         # location = ip_metadata.json()['city']
         location = None
         
-        title, response = await rag_service.get_answer(user_id, query_input, ip_address, location, chat_id)
+        title, response = rag_service.get_answer(user_id, query_input, ip_address, location, chat_id)
         
         logger.info(f"Query processed successfully for user_id: {user_id}, chat_id: {chat_id}")
         

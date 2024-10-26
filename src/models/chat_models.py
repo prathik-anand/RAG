@@ -1,13 +1,13 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from src.database import Base  # Assuming you have a Base for SQLAlchemy models
+from src.database import Base
 
 class ChatMetadata(Base):
     __tablename__ = 'chat_metadata'
 
-    chat_id = Column(Integer, primary_key=True)  # This is the primary key
-    user_id = Column(Integer, nullable=False)  # Assuming user_id is an Integer
+    chat_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=False)
     title = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     modified_at = Column(DateTime(timezone=True), onupdate=func.now())
