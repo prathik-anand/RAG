@@ -12,8 +12,3 @@ class DocumentRepository(ABC):
     def create_embeddings(self, documents):
         """Create embeddings for the provided documents."""
         pass
-
-    @abstractmethod
-    def save_embeddings(self):
-        """Save the created embeddings to the vector store."""
-        pass

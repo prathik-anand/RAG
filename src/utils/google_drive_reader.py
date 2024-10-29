@@ -5,7 +5,7 @@ from googleapiclient.errors import HttpError
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, Docx2txtLoader
 from langchain.schema import Document
 from src.config import Config
-from src.utils.logger import Logger
+from src.utils.log_util import Logger
 
 
 class GoogleDriveReader:

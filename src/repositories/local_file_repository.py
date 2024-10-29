@@ -39,7 +39,7 @@ class LocalFileRepository(DocumentRepository):
             self.save_embeddings(documents)
 
     def save_embeddings(self, embeddings):
-        self.vector_store_repo.create_full_indexes(embeddings)    
+        self.vector_store_repo.add_to_indexes(embeddings)    
 
 
     def list_files(self, directory_path=None):

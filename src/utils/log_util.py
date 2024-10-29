@@ -28,7 +28,7 @@ class Logger:
 
     @staticmethod
     def log_info(message):
-        if LOGGING_LEVEL == "DEBUG":  # Only log if the level is DEBUG
+        if LOGGING_LEVEL == "INFO":  # Only log if the level is DEBUG
             file_name, line_number = Logger._get_caller_info()
             logging.info(f"{message} - {file_name} - Line: {line_number}")
 

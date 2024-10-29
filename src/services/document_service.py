@@ -3,8 +3,8 @@ from src.repositories.vector_store_repository import VectorStoreRepository
 from src.config import Config
 
 class DocumentService:
-    def __init__(self, folder_id: str):
-        self.folder_id = folder_id
+    def __init__(self):
+        self.folder_id = os.getenv('DATA_FOLDER_ID')
         self.google_drive_reader = GoogleDriveReader(folder_id, 'path/to/credentials.json')
         self.vector_store_repo = VectorStoreRepository()
 
