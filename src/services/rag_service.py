@@ -15,7 +15,7 @@ class RAGService:
             model_name=LLM_MODEL_NAME,
             api_key=Config.GROQ_API_KEY
         )
-        self.vector_store = VectorStoreManager().get_vector_store()
+        self.vector_store = VectorStoreManager.get_vector_store()
         self.chat_repo = ChatRepository()
 
     def get_answer(self, user_id, query_input, ip_address, location, chat_id=None):
@@ -27,7 +27,7 @@ class RAGService:
                     Logger.log_error(f"Chat ID does not exist %s" % chat_id)
                     raise ValueError("Chat ID does not exist.")
                 
-                response = self.query_vector_Store(query_input)
+                response = self.query_vector_store(query_input)
 
                 current_history_count = self.chat_repo.get_chat_history_count(chat_metadata.chat_id)
                 sort_order = current_history_count + 1
@@ -41,7 +41,7 @@ class RAGService:
                 title = self.generate_title(query_input)  # Generate a title for the new chat
                 chat_metadata = self.chat_repo.create_chat_metadata(user_id, title)
 
-                response = self.query_vector_Store(query_input)
+                response = self.query_vector_store(query_input)
 
                 # Save chat history asynchronously
                 asyncio.run(self.save_chat_history(user_id, query_input, response, chat_metadata.chat_id, 1, ip_address, location))
@@ -54,7 +54,7 @@ class RAGService:
             Logger.log_error(f"An error occurred while processing the query: {str(e)}", exc_info=True)
             raise RuntimeError("An error occurred while processing the query: " + str(e))
 
-    def query_vector_Store(self, question):
+    def query_vector_store(self, question):
         try:
             relevant_docs = self.vector_store.similarity_search(question, k=VECTOR_STORE_SIMILARITY_K)
             context = "\n".join([doc.page_content for doc in relevant_docs])

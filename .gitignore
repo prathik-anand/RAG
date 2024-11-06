@@ -24,7 +24,9 @@ venv.bak/
 
 # Project specific
 vector_store/
+vector_store_copy/
 data/
+temp_data/
 *.log
 
 # OS specific

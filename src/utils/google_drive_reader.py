@@ -6,17 +6,18 @@ from langchain_community.document_loaders import TextLoader, PyPDFLoader, Docx2t
 from langchain.schema import Document
 from src.config import Config
 from src.utils.log_util import Logger
+from typing import List
 
 
 class GoogleDriveReader:
-    def __init__(self):
-        self.credentials_file = Config.GOOGLE_DRIVE_CREDENTIALS_FILE
-        self.service = self.authenticate()
+    def __init__(self, credentials_file):
+        # Initialize Google Drive API client here
+        self.service = self.authenticate(os.getenv("GOOGLE_DRIVE_CREDENTIALS_FILE"))
 
-    def authenticate(self):
+    def authenticate(self, credentials_file):
         """Authenticate and create the Google Drive service."""
         creds = service_account.Credentials.from_service_account_file(
-            self.credentials_file,
+            credentials_file,
             scopes=['https://www.googleapis.com/auth/drive.readonly']
         )
         return build('drive', 'v3', credentials=creds)
@@ -50,8 +51,8 @@ class GoogleDriveReader:
     def read_documents(self):
         """Read documents from Google Drive and return as a list of Document objects."""
         documents = []
-        files = self.list_files()
-        
+        files = self.list_all_folders_and_files()  # Get all files and folders
+
         for file in files:
             file_id = file['id']
             file_name = file['name']
@@ -66,13 +67,13 @@ class GoogleDriveReader:
                 documents.append(Document(page_content=text, metadata={"name": file_name}))
             elif mime_type == 'application/pdf':
                 # PDF
-                documents.append(PyPDFLoader(file_id).load())
+                documents.extend(PyPDFLoader(file_id).load())
             elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                 # Word Document
-                documents.append(Docx2txtLoader(file_id).load())
+                documents.extend(Docx2txtLoader(file_id).load())
             elif mime_type == 'text/plain':
                 # Text File
-                documents.append(TextLoader(file_id).load())
+                documents.extend(TextLoader(file_id).load())
             else:
                 print(f'Skipping unsupported file type: {mime_type}')
 

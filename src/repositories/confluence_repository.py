@@ -33,7 +33,7 @@ class ConfluenceRepository(DocumentRepository):
 
         return documents
 
-    def create_embeddings(self):
+    def read_files_and_create_embeddings(self):
         """Create embeddings for the provided documents."""
         documents = self.read_documents()
         if documents:
@@ -64,4 +64,5 @@ class ConfluenceRepository(DocumentRepository):
 
         return documents
     
-
+    def create_embeddings(self):
+        pass    
