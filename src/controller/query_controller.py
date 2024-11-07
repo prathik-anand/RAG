@@ -1,7 +1,8 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, g
 from src.services.rag_service import RAGService
 import requests
 import logging
+from src.services.auth_service import authorize_request
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -11,11 +12,12 @@ query_bp = Blueprint('query', __name__)
 rag_service = RAGService()
 
 @query_bp.route('/query', methods=['POST'])
+@authorize_request
 def query():
     """This endpoint is used to query the Chroma DB"""
     try:
         query_input = request.json.get('query')
-        user_id = 1
+        user_id = g.user_profile.get('id')
         chat_id = request.args.get('chat_id')
         if chat_id == '':
             chat_id = None

@@ -16,6 +16,7 @@ The RAG application not only processes local files but also integrates with clou
 - **RAG Pipeline**: Implements a Retrieval-Augmented Generation pipeline for answering questions based on indexed documents.
 - **API Endpoint**: Provides a simple API endpoint for querying the system.
 - **Chat History Tracking**: Tracks chat histories and metadata in a PostgreSQL database, allowing for efficient retrieval and analysis of past interactions.
+- **Authorization**: Implements a scalable authorization mechanism that validates tokens and retrieves user profiles from an authentication server, ensuring secure access to the application.
 
 ## Efficient Use of Chroma DB
 
@@ -32,7 +33,35 @@ Our application leverages Chroma DB as a vector store for efficient management a
 9. **Consistency**: Ensures consistent search results across application restarts due to vector store persistence.
 10. **Flexibility for Updates**: The structure allows for future enhancements, such as incremental updates to the vector store.
 
-This implementation balances performance, efficiency, and scalability, providing fast query responses and maintaining a persistent, updateable knowledge base for enhanced question-answering capabilities.
+## Authorization Mechanism
+
+The application includes a robust authorization mechanism that validates user tokens and retrieves user profiles from an authentication server. This mechanism is designed to be scalable and reusable across different API endpoints. 
+
+### Key Features of the Authorization System:
+- **Token Validation**: Automatically checks for the presence of an authorization token in the request headers.
+- **Profile Retrieval**: Fetches user profile information from the authentication server, allowing for personalized interactions.
+- **Scalability**: The authorization decorator can be easily applied to any API endpoint, ensuring secure access throughout the application.
+
+### Usage in Other APIs
+To use the authorization mechanism in other API endpoints, simply decorate your route functions with the `@authorize_request` decorator. This will ensure that the token is validated and the user profile is available in the request context.
+
+### Example:
+```
+from src.services.auth_service import authorize_request
+
+@query_bp.route('/another_endpoint', methods=['GET'])
+@authorize_request
+def another_endpoint():
+    # Your endpoint logic here
+    
+```
+### curl
+```
+curl -X POST http://localhost:5000/query \
+-H "Authorization: Bearer your_access_token" \
+-H "Content-Type: application/json" \
+-d '{"query": "Your question here"}'
+```
 
 ## Installation
 
@@ -74,6 +103,7 @@ This implementation balances performance, efficiency, and scalability, providing
    DB_NAME=dbname # e.g. RAG_CHAT
    DB_USER=dbusername # e.g. postgres
    DB_PASSWORD=dbpassword # e.g. xyzabc
+   AUTH_SERVER_URL=http://localhost:5010  # URL for the auth server
    ```
 
 ## Usage
@@ -108,13 +138,13 @@ This implementation balances performance, efficiency, and scalability, providing
 - `data/`: Directory for storing documents to be processed.
 - `vector_store/`: Directory where the Chroma vector store is persisted.
 
-## UI Repository (Optional)
+## Authorization Repository (Required for the application to work)
 
-This repository can help you build a user interface for your RAG application:
+For a more comprehensive authorization solution, consider using the following repository:
 ```bash
-git clone https://github.com/prathik-anand/rag-ui
+git clone https://github.com/prathik-anand/Auth-Flask
 ```
 
 ## Conclusion
 
-This RAG application provides a powerful framework for efficiently managing and querying document embeddings from both local and cloud-based sources, enhancing the user experience through fast and accurate information retrieval. Additionally, it tracks chat histories and metadata in a PostgreSQL database, allowing for comprehensive analysis of user interactions.
+This RAG application provides a powerful framework for efficiently managing and querying document embeddings from both local and cloud-based sources, enhancing the user experience through fast and accurate information retrieval. Additionally, it tracks chat histories and metadata in a PostgreSQL database, allowing for comprehensive analysis of user interactions. The scalable authorization mechanism ensures secure access to the application, making it suitable for various use cases.
