@@ -6,6 +6,9 @@ This is a Flask-based RAG application that utilizes Chroma DB for vector storage
 
 The RAG application not only processes local files but also integrates with cloud-based document repositories such as **Google Drive** and **Confluence**. This allows users to seamlessly read files and create indexes for them, enhancing the application's versatility and usability.
 
+## Architecture
+![Architecture](./architecture.jpg) 
+
 ## Features
 
 - **Document Processing**: Supports indexing of PDF, DOCX, and TXT files from local storage.
@@ -17,6 +20,7 @@ The RAG application not only processes local files but also integrates with clou
 - **API Endpoint**: Provides a simple API endpoint for querying the system.
 - **Chat History Tracking**: Tracks chat histories and metadata in a PostgreSQL database, allowing for efficient retrieval and analysis of past interactions.
 - **Authorization**: Implements a scalable authorization mechanism that validates tokens and retrieves user profiles from an authentication server, ensuring secure access to the application.
+- **Contextual Responses**: Incorporates existing chat history into the LLM's context to generate more relevant and coherent responses.
 
 ## Efficient Use of Chroma DB
 
@@ -62,6 +66,23 @@ curl -X POST http://localhost:5000/query \
 -H "Content-Type: application/json" \
 -d '{"query": "Your question here"}'
 ```
+
+## Contextual Responses with Chat History
+
+The application supports incorporating existing chat history into the context for generating responses. This feature enhances the LLM's ability to provide relevant and coherent answers based on previous interactions.
+
+### How It Works:
+- When a user queries the system with an existing `chat_id`, the application retrieves the associated chat history.
+- The chat history is formatted and included in the prompt sent to the LLM, allowing it to generate responses that consider the context of the conversation.
+
+### Example of Chat History Formatting:
+The chat history is formatted as follows:
+```
+User: [User's previous input]
+AI: [AI's previous response]
+```
+
+This context is combined with the current user query to create a comprehensive prompt for the LLM.
 
 ## Installation
 
@@ -147,4 +168,4 @@ git clone https://github.com/prathik-anand/Auth-Flask
 
 ## Conclusion
 
-This RAG application provides a powerful framework for efficiently managing and querying document embeddings from both local and cloud-based sources, enhancing the user experience through fast and accurate information retrieval. Additionally, it tracks chat histories and metadata in a PostgreSQL database, allowing for comprehensive analysis of user interactions. The scalable authorization mechanism ensures secure access to the application, making it suitable for various use cases.
+This RAG application provides a powerful framework for efficiently managing and querying document embeddings from both local and cloud-based sources, enhancing the user experience through fast and accurate information retrieval. Additionally, it tracks chat histories and metadata in a PostgreSQL database, allowing for comprehensive analysis of user interactions. The scalable authorization mechanism ensures secure access to the application, making it suitable for various use cases. The incorporation of chat history into the LLM's context further improves the relevance and coherence of responses, enhancing the overall conversational experience.

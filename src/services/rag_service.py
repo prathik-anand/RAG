@@ -21,13 +21,19 @@ class RAGService:
     def get_answer(self, user_id, query_input, ip_address, location, chat_id=None):
         try:
             if chat_id:
-                Logger.log_info(f"Get answer with for query with Chat ID %s and user_id %s" % (chat_id, user_id))
+                Logger.log_info(f"Get answer for query with Chat ID %s and user_id %s" % (chat_id, user_id))
                 chat_metadata = self.chat_repo.get_chat_metadata(chat_id)
                 if not chat_metadata:
                     Logger.log_error(f"Chat ID does not exist %s" % chat_id)
                     raise ValueError("Chat ID does not exist.")
                 
-                response = self.query_vector_store(query_input)
+                # Retrieve chat history
+                chat_history = self.chat_repo.get_chat_history_by_chat_id_and_user_id(chat_metadata.chat_id, user_id)
+                context = self.format_chat_history(chat_history)  # Format the chat history for the prompt
+
+                # Combine context with the current query
+                full_prompt = f"{context}\nUser: {query_input}\nAI:"
+                response = self.query_vector_store(full_prompt)
 
                 current_history_count = self.chat_repo.get_chat_history_count(chat_metadata.chat_id)
                 sort_order = current_history_count + 1
@@ -41,6 +47,7 @@ class RAGService:
                 title = self.generate_title(query_input)  # Generate a title for the new chat
                 chat_metadata = self.chat_repo.create_chat_metadata(user_id, title)
 
+                # No previous context, just query the vector store
                 response = self.query_vector_store(query_input)
 
                 # Save chat history asynchronously
@@ -87,3 +94,10 @@ class RAGService:
         except Exception as e:
             Logger.error(f"Error generating title: {str(e)}", exc_info=True)
             raise RuntimeError("Error generating title: " + str(e))
+
+    def format_chat_history(self, chat_history):
+        """Format the chat history for inclusion in the prompt."""
+        formatted_history = []
+        for entry in chat_history:
+            formatted_history.append(f"User: {entry.request}\nAI: {entry.response}")
+        return "\n".join(formatted_history)
