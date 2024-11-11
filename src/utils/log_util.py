@@ -3,9 +3,10 @@ import inspect
 import time
 from src.constants import LOGGING_LEVEL
 
+# Set up logging configuration
 logging.basicConfig(
     level=getattr(logging, LOGGING_LEVEL),
-    format='%(asctime)s - %(levelname)s - %(message)s - %(filename)s - Line: %(lineno)d',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
         logging.FileHandler("application.log"),
@@ -28,13 +29,13 @@ class Logger:
 
     @staticmethod
     def log_info(message):
-        if LOGGING_LEVEL == "INFO":  # Only log if the level is DEBUG
+        if LOGGING_LEVEL in ["INFO"]: 
             file_name, line_number = Logger._get_caller_info()
             logging.info(f"{message} - {file_name} - Line: {line_number}")
 
     @staticmethod
     def log_warning(message):
-        if LOGGING_LEVEL in ["DEBUG", "WARNING"]:  # Log if level is DEBUG or WARNING
+        if LOGGING_LEVEL in ["DEBUG", "WARNING"]:
             file_name, line_number = Logger._get_caller_info()
             logging.warning(f"{message} - {file_name} - Line: {line_number}")
 
@@ -45,22 +46,9 @@ class Logger:
 
     @staticmethod
     def log_debug(message):
-        if LOGGING_LEVEL == "DEBUG":  # Only log if the level is DEBUG
+        if LOGGING_LEVEL == "DEBUG":
             file_name, line_number = Logger._get_caller_info()
             logging.debug(f"{message} - {file_name} - Line: {line_number}")
-
-    @staticmethod
-    def error(message, exc_info=False):
-        logging.error(message, exc_info=exc_info)
-    
-    @staticmethod
-    def warning(message):
-        logging.warning(message)
-    
-    @staticmethod
-    def info(message):
-        logging.info(message)
-
 
 # Custom function to override the default time function to return UTC time
 def utc_time(*args):

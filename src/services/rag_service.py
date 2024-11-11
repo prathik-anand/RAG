@@ -7,6 +7,9 @@ from src.constants import LLM_MODEL_NAME, LLM_TEMPERATURE, VECTOR_STORE_SIMILARI
 from src.repositories.chat_repository import ChatRepository
 from src.utils.log_util import Logger
 import asyncio
+from langdetect import detect, DetectorFactory
+#from googletrans import Translator
+DetectorFactory.seed = 0
 
 class RAGService:
     def __init__(self):
@@ -17,9 +20,15 @@ class RAGService:
         )
         self.vector_store = VectorStoreManager.get_vector_store()
         self.chat_repo = ChatRepository()
+        #self.translator = Translator() 
+        #self.deep_translator = GoogleTranslator()
 
     def get_answer(self, user_id, query_input, ip_address, location, chat_id=None):
         try:
+            # Detect the language of the query
+            language = detect(query_input)
+            Logger.log_info(f"Detected language: {language}")
+
             if chat_id:
                 Logger.log_info(f"Get answer for query with Chat ID %s and user_id %s" % (chat_id, user_id))
                 chat_metadata = self.chat_repo.get_chat_metadata(chat_id)
@@ -33,7 +42,7 @@ class RAGService:
 
                 # Combine context with the current query
                 full_prompt = f"{context}\nUser: {query_input}\nAI:"
-                response = self.query_vector_store(full_prompt)
+                response = self.query_vector_store(full_prompt, language)
 
                 current_history_count = self.chat_repo.get_chat_history_count(chat_metadata.chat_id)
                 sort_order = current_history_count + 1
@@ -48,7 +57,7 @@ class RAGService:
                 chat_metadata = self.chat_repo.create_chat_metadata(user_id, title)
 
                 # No previous context, just query the vector store
-                response = self.query_vector_store(query_input)
+                response = self.query_vector_store(query_input, language)
 
                 # Save chat history asynchronously
                 asyncio.run(self.save_chat_history(user_id, query_input, response, chat_metadata.chat_id, 1, ip_address, location))
@@ -61,12 +70,15 @@ class RAGService:
             Logger.log_error(f"An error occurred while processing the query: {str(e)}", exc_info=True)
             raise RuntimeError("An error occurred while processing the query: " + str(e))
 
-    def query_vector_store(self, question):
+    def query_vector_store(self, question, language):
         try:
             relevant_docs = self.vector_store.similarity_search(question, k=VECTOR_STORE_SIMILARITY_K)
             context = "\n".join([doc.page_content for doc in relevant_docs])
+            
+            #translated_context = self.translate_text(context, language)
+            
             prompt = PromptTemplate(template=RAG_PROMPT_TEMPLATE, input_variables=["context", "question"])
-            final_prompt = prompt.format(context=context, question=question)
+            final_prompt = prompt.format(context=context, question=question) 
             response = self.llm.invoke([HumanMessage(content=final_prompt)])
             Logger.info("Successfully queried the vector store.")
             return response.content
@@ -101,3 +113,8 @@ class RAGService:
         for entry in chat_history:
             formatted_history.append(f"User: {entry.request}\nAI: {entry.response}")
         return "\n".join(formatted_history)
+    
+    #def translate_text(self, text, target_language):
+        #translator = GoogleTranslator(target=target_language)
+        #translation = translator.translate(text)
+        #return translation

@@ -15,4 +15,4 @@ Question: {question}
 Answer:"""
 
 # Logging Configuration
-LOGGING_LEVEL = "ERROR"
+LOGGING_LEVEL = "INFO"
