@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 query_bp = Blueprint('query', __name__)
 rag_service = RAGService()
 
-@query_bp.route('/query', methods=['POST'])
+#@query_bp.route('/query', methods=['POST'])
 @authorize_request
 def query():
     """This endpoint is used to query the Chroma DB"""
